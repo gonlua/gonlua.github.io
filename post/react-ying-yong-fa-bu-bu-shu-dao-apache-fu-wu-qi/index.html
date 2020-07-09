@@ -1,13 +1,20 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>React应用发布部署到Apache服务器 | Gridea</title>
-<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1594289560077">
-<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+    <meta charset="utf-8" >
+
+<title>React应用发布部署到Apache服务器 | gonlua&#39;s blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1594289737426">
 <link rel="stylesheet" href="https://gonlua.github.io/styles/main.css">
-<link rel="alternate" type="application/atom+xml" title="React应用发布部署到Apache服务器 | Gridea - Atom Feed" href="https://gonlua.github.io/atom.xml">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
 
 
@@ -18,90 +25,81 @@ Apache部分
 对于使用了Router的单页面React应用，浏览器范围的地址是虚拟的，没有对应的资源，所以需要将访问地址都重写为index.html
 ..." />
     <meta name="keywords" content="React,Apache" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
-    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
   </head>
   <body>
-    <div class="main">
-      <div class="main-content">
-        <div class="site-header">
-  <a href="https://gonlua.github.io">
-  <img class="avatar" src="https://gonlua.github.io/images/avatar.png?v=1594289560077" alt="">
-  </a>
-  <h1 class="site-title">
-    Gridea
-  </h1>
-  <p class="site-description">
-    温故而知新
-  </p>
-  <div class="menu-container">
-    
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://gonlua.github.io">
+        <img src="https://gonlua.github.io/images/avatar.png?v=1594289737426" class="site-logo">
+        <h1 class="site-title">gonlua&#39;s blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
       
-        <a href="/" class="menu">
-          首页
-        </a>
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
       
-    
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
       
-        <a href="/archives" class="menu">
-          归档
-        </a>
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
       
-    
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
       
-        <a href="/tags" class="menu">
-          标签
-        </a>
-      
-    
-      
-        <a href="/post/about" class="menu">
-          关于
-        </a>
-      
-    
+    </div>
   </div>
-  <div class="social-container">
-    
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
       
-    
+        
+      
+    </div>
+    <div class="site-description">
+      ゴンルアのブログ
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
   </div>
 </div>
 
-        <div class="post-detail">
-          <article class="post">
-            <h2 class="post-title">
-              React应用发布部署到Apache服务器
-            </h2>
-            <div class="post-info">
-              <span>
-                2020-07-09
-              </span>
-              <span>
-                2 min read
-              </span>
-              
-                <a href="https://gonlua.github.io/tag/yaCn0lSnI/" class="post-tag">
-                  # React
-                </a>
-              
-                <a href="https://gonlua.github.io/tag/HhoopoMWY/" class="post-tag">
-                  # Apache
-                </a>
-              
-            </div>
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">React应用发布部署到Apache服务器</h2>
+            <div class="post-date">2020-07-09</div>
             
-            <div class="post-content-wrapper">
-              <div class="post-content">
-                <p>Apache版本：2.2.3<br>
+            <div class="post-content" v-pre>
+              <p>Apache版本：2.2.3<br>
 React版本：16.13.1</p>
 <h1 id="apache部分">Apache部分</h1>
 <h2 id="1-配置允许地址重写">1. 配置允许地址重写</h2>
@@ -156,90 +154,57 @@ RewriteRule . index.html [L]
 <p><a href="https://skryvets.com/blog/2018/09/20/an-elegant-solution-of-deploying-react-app-into-a-subdirectory/">An elegant solution of deploying React app into a subdirectory</a></p>
 </blockquote>
 
-              </div>
-              <div class="toc-container">
-                <ul class="markdownIt-TOC">
-<li><a href="#apache%E9%83%A8%E5%88%86">Apache部分</a>
-<ul>
-<li><a href="#1-%E9%85%8D%E7%BD%AE%E5%85%81%E8%AE%B8%E5%9C%B0%E5%9D%80%E9%87%8D%E5%86%99">1. 配置允许地址重写</a></li>
-<li><a href="#2-%E9%85%8D%E7%BD%AE%E5%9C%B0%E5%9D%80%E9%87%8D%E5%86%99%E8%A7%84%E5%88%99">2. 配置地址重写规则</a></li>
-</ul>
-</li>
-<li><a href="#react%E9%83%A8%E5%88%86">React部分</a>
-<ul>
-<li><a href="#1-%E9%85%8D%E7%BD%AE%E4%BA%8C%E7%BA%A7%E7%9B%AE%E5%BD%95">1. 配置二级目录</a></li>
-<li><a href="#2-%E5%8F%91%E5%B8%83">2. 发布</a></li>
-</ul>
-</li>
-</ul>
-
-              </div>
             </div>
-          </article>
-        </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/yaCn0lSnI/" class="tag">
+                    React
+                  </a>
+                
+                  <a href="https://gonlua.github.io/tag/HhoopoMWY/" class="tag">
+                    Apache
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/springboot-jie-jue-kua-yu-wen-ti-kua-yu-yu-lan-jie-qi-chong-tu-wen-ti/">
+                  <h3 class="post-title">
+                    SpringBoot解决跨域问题/跨域与拦截器冲突问题
+                  </h3>
+                </a>
+              </div>
+            
 
-        
-          <div class="next-post">
-            <div class="next">下一篇</div>
-            <a href="https://gonlua.github.io/post/springboot-jie-jue-kua-yu-wen-ti-kua-yu-yu-lan-jie-qi-chong-tu-wen-ti/">
-              <h3 class="post-title">
-                SpringBoot解决跨域问题/跨域与拦截器冲突问题
-              </h3>
-            </a>
+            
+
           </div>
-        
 
-        
-
-        <div class="site-footer">
-  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
-  <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">
-    <i class="ri-rss-line"></i> RSS
-  </a>
-</div>
-
+        </div>
       </div>
     </div>
 
-    <script>
-      hljs.initHighlightingOnLoad()
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
 
-      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+AOS.init();
 
-      // This should probably be throttled.
-      // Especially because it triggers during smooth scrolling.
-      // https://lodash.com/docs/4.17.10#throttle
-      // You could do like...
-      // window.addEventListener("scroll", () => {
-      //    _.throttle(doThatStuff, 100);
-      // });
-      // Only not doing it here to keep this Pen dependency-free.
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
 
-      window.addEventListener("scroll", event => {
-        let fromTop = window.scrollY;
+</script>
 
-        mainNavLinks.forEach((link, index) => {
-          let section = document.getElementById(decodeURI(link.hash).substring(1));
-          let nextSection = null
-          if (mainNavLinks[index + 1]) {
-            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
-          }
-          if (section.offsetTop <= fromTop) {
-            if (nextSection) {
-              if (nextSection.offsetTop > fromTop) {
-                link.classList.add("current");
-              } else {
-                link.classList.remove("current");    
-              }
-            } else {
-              link.classList.add("current");
-            }
-          } else {
-            link.classList.remove("current");
-          }
-        });
-      });
 
-    </script>
+
+
+
+
   </body>
 </html>
