@@ -1,0 +1,343 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SpringBoot兼容java 6 | Gridea</title>
+<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1594289315333">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.3.0/fonts/remixicon.css" rel="stylesheet">
+<link rel="stylesheet" href="https://gonlua.github.io/styles/main.css">
+<link rel="alternate" type="application/atom+xml" title="SpringBoot兼容java 6 | Gridea - Atom Feed" href="https://gonlua.github.io/atom.xml">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Droid+Serif:400,700">
+
+
+
+    <meta name="description" content="
+降低SpringBoot版本，我用的是1.5.3.RELEASE
+
+&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;ar..." />
+    <meta name="keywords" content="SpringBoot" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  </head>
+  <body>
+    <div class="main">
+      <div class="main-content">
+        <div class="site-header">
+  <a href="https://gonlua.github.io">
+  <img class="avatar" src="https://gonlua.github.io/images/avatar.png?v=1594289315333" alt="">
+  </a>
+  <h1 class="site-title">
+    Gridea
+  </h1>
+  <p class="site-description">
+    温故而知新
+  </p>
+  <div class="menu-container">
+    
+      
+        <a href="/" class="menu">
+          首页
+        </a>
+      
+    
+      
+        <a href="/archives" class="menu">
+          归档
+        </a>
+      
+    
+      
+        <a href="/tags" class="menu">
+          标签
+        </a>
+      
+    
+      
+        <a href="/post/about" class="menu">
+          关于
+        </a>
+      
+    
+  </div>
+  <div class="social-container">
+    
+      
+    
+      
+    
+      
+    
+      
+    
+      
+    
+  </div>
+</div>
+
+        <div class="post-detail">
+          <article class="post">
+            <h2 class="post-title">
+              SpringBoot兼容java 6
+            </h2>
+            <div class="post-info">
+              <span>
+                2020-07-09
+              </span>
+              <span>
+                6 min read
+              </span>
+              
+                <a href="https://gonlua.github.io/tag/K-cma7AF-/" class="post-tag">
+                  # SpringBoot
+                </a>
+              
+            </div>
+            
+            <div class="post-content-wrapper">
+              <div class="post-content">
+                <ol>
+<li>降低SpringBoot版本，我用的是1.5.3.RELEASE</li>
+</ol>
+<pre><code class="language-xml">&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;1.5.3.RELEASE&lt;/version&gt;
+    &lt;relativePath /&gt;
+&lt;/parent&gt;
+......
+&lt;properties&gt;
+    &lt;java.version&gt;1.6&lt;/java.version&gt;
+&lt;/properties&gt;
+</code></pre>
+<ol start="2">
+<li>使用兼容的内容web服务器: tomcat 7.0.59</li>
+</ol>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;tomcat.version&gt;7.0.59&lt;/tomcat.version&gt;
+&lt;/properties&gt;
+......
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;
+    &lt;artifactId&gt;tomcat-juli&lt;/artifactId&gt;
+    &lt;version&gt;${tomcat.version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="3">
+<li>安装支持java 6的maven(最后一个版本是3.2.5)并配置</li>
+</ol>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;maven.compiler.source&gt;1.6&lt;/maven.compiler.source&gt;
+    &lt;maven.compiler.target&gt;1.6&lt;/maven.compiler.target&gt;
+&lt;/properties&gt;
+......
+&lt;project&gt;
+    ......
+    &lt;build&gt;
+		&lt;finalName&gt;XXX&lt;/finalName&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+				&lt;configuration&gt;
+					&lt;source&gt;${maven.compiler.source}&lt;/source&gt;
+					&lt;target&gt;${maven.compiler.target}&lt;/target&gt;
+				&lt;/configuration&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+&lt;/project&gt;
+</code></pre>
+<ol start="4">
+<li>如果用到mybatis</li>
+</ol>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;1.1.1&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="5">
+<li>如果用到JWT</li>
+</ol>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.nimbusds&lt;/groupId&gt;
+    &lt;artifactId&gt;nimbus-jose-jwt&lt;/artifactId&gt;
+    &lt;classifier&gt;jdk16&lt;/classifier&gt;
+    &lt;version&gt;4.11.2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="6">
+<li>降低Jackson版本到2.6.X，我用的是2.6.3</li>
+</ol>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;jackson.version&gt;2.6.7&lt;/jackson.version&gt;
+&lt;/properties&gt;
+......
+&lt;project&gt;
+    ......
+	&lt;dependencyManagement&gt;
+		&lt;dependencies&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-annotations&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-core&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-dataformat-csv&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-dataformat-xml&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-dataformat-yaml&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-hibernate4&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-hibernate5&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-jdk7&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-jdk8&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-joda&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-jsr310&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-jaxrs-base&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-jaxrs-json-provider&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.module&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-module-parameter-names&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+		&lt;/dependencies&gt;
+	&lt;/dependencyManagement&gt;
+&lt;/project&gt;
+</code></pre>
+<ol start="7">
+<li>如果用到JTA也要做兼容，具体参考官方文档</li>
+</ol>
+<br/>
+参考官方文档：
+[How to use Java 6](https://docs.spring.io/spring-boot/docs/1.5.x/reference/htmlsingle/#howto-use-java-6)
+              </div>
+              <div class="toc-container">
+                
+              </div>
+            </div>
+          </article>
+        </div>
+
+        
+          <div class="next-post">
+            <div class="next">下一篇</div>
+            <a href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
+              <h3 class="post-title">
+                antd Select组件在IE11下闪烁问题解决
+              </h3>
+            </a>
+          </div>
+        
+
+        
+
+        <div class="site-footer">
+  Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+  <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">
+    <i class="ri-rss-line"></i> RSS
+  </a>
+</div>
+
+      </div>
+    </div>
+
+    <script>
+      hljs.initHighlightingOnLoad()
+
+      let mainNavLinks = document.querySelectorAll(".markdownIt-TOC a");
+
+      // This should probably be throttled.
+      // Especially because it triggers during smooth scrolling.
+      // https://lodash.com/docs/4.17.10#throttle
+      // You could do like...
+      // window.addEventListener("scroll", () => {
+      //    _.throttle(doThatStuff, 100);
+      // });
+      // Only not doing it here to keep this Pen dependency-free.
+
+      window.addEventListener("scroll", event => {
+        let fromTop = window.scrollY;
+
+        mainNavLinks.forEach((link, index) => {
+          let section = document.getElementById(decodeURI(link.hash).substring(1));
+          let nextSection = null
+          if (mainNavLinks[index + 1]) {
+            nextSection = document.getElementById(decodeURI(mainNavLinks[index + 1].hash).substring(1));
+          }
+          if (section.offsetTop <= fromTop) {
+            if (nextSection) {
+              if (nextSection.offsetTop > fromTop) {
+                link.classList.add("current");
+              } else {
+                link.classList.remove("current");    
+              }
+            } else {
+              link.classList.add("current");
+            }
+          } else {
+            link.classList.remove("current");
+          }
+        });
+      });
+
+    </script>
+  </body>
+</html>

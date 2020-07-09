@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://gonlua.github.io</id>
+    <title>Gridea</title>
+    <updated>2020-07-09T10:08:41.487Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://gonlua.github.io"/>
+    <link rel="self" href="https://gonlua.github.io/atom.xml"/>
+    <subtitle>温故而知新</subtitle>
+    <logo>https://gonlua.github.io/images/avatar.png</logo>
+    <icon>https://gonlua.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2020, Gridea</rights>
+    <entry>
+        <title type="html"><![CDATA[SpringBoot兼容java 6]]></title>
+        <id>https://gonlua.github.io/post/springboot-jian-rong-java-6/</id>
+        <link href="https://gonlua.github.io/post/springboot-jian-rong-java-6/">
+        </link>
+        <updated>2020-07-09T08:32:06.000Z</updated>
+        <content type="html"><![CDATA[<ol>
+<li>降低SpringBoot版本，我用的是1.5.3.RELEASE</li>
+</ol>
+<pre><code class="language-xml">&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;1.5.3.RELEASE&lt;/version&gt;
+    &lt;relativePath /&gt;
+&lt;/parent&gt;
+......
+&lt;properties&gt;
+    &lt;java.version&gt;1.6&lt;/java.version&gt;
+&lt;/properties&gt;
+</code></pre>
+<ol start="2">
+<li>使用兼容的内容web服务器: tomcat 7.0.59</li>
+</ol>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;tomcat.version&gt;7.0.59&lt;/tomcat.version&gt;
+&lt;/properties&gt;
+......
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;
+    &lt;artifactId&gt;tomcat-juli&lt;/artifactId&gt;
+    &lt;version&gt;${tomcat.version}&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="3">
+<li>安装支持java 6的maven(最后一个版本是3.2.5)并配置</li>
+</ol>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;maven.compiler.source&gt;1.6&lt;/maven.compiler.source&gt;
+    &lt;maven.compiler.target&gt;1.6&lt;/maven.compiler.target&gt;
+&lt;/properties&gt;
+......
+&lt;project&gt;
+    ......
+    &lt;build&gt;
+		&lt;finalName&gt;XXX&lt;/finalName&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+				&lt;configuration&gt;
+					&lt;source&gt;${maven.compiler.source}&lt;/source&gt;
+					&lt;target&gt;${maven.compiler.target}&lt;/target&gt;
+				&lt;/configuration&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+&lt;/project&gt;
+</code></pre>
+<ol start="4">
+<li>如果用到mybatis</li>
+</ol>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;
+    &lt;version&gt;1.1.1&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="5">
+<li>如果用到JWT</li>
+</ol>
+<pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.nimbusds&lt;/groupId&gt;
+    &lt;artifactId&gt;nimbus-jose-jwt&lt;/artifactId&gt;
+    &lt;classifier&gt;jdk16&lt;/classifier&gt;
+    &lt;version&gt;4.11.2&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<ol start="6">
+<li>降低Jackson版本到2.6.X，我用的是2.6.3</li>
+</ol>
+<pre><code class="language-xml">&lt;properties&gt;
+    &lt;jackson.version&gt;2.6.7&lt;/jackson.version&gt;
+&lt;/properties&gt;
+......
+&lt;project&gt;
+    ......
+	&lt;dependencyManagement&gt;
+		&lt;dependencies&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-annotations&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-core&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-dataformat-csv&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-dataformat-xml&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-dataformat-yaml&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-hibernate4&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-hibernate5&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-jdk7&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-jdk8&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-joda&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-datatype-jsr310&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-jaxrs-base&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-jaxrs-json-provider&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+			&lt;dependency&gt;
+				&lt;groupId&gt;com.fasterxml.jackson.module&lt;/groupId&gt;
+				&lt;artifactId&gt;jackson-module-parameter-names&lt;/artifactId&gt;
+				&lt;version&gt;${jackson.version}&lt;/version&gt;
+			&lt;/dependency&gt;
+		&lt;/dependencies&gt;
+	&lt;/dependencyManagement&gt;
+&lt;/project&gt;
+</code></pre>
+<ol start="7">
+<li>如果用到JTA也要做兼容，具体参考官方文档</li>
+</ol>
+<br/>
+参考官方文档：
+[How to use Java 6](https://docs.spring.io/spring-boot/docs/1.5.x/reference/htmlsingle/#howto-use-java-6)]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[antd Select组件在IE11下闪烁问题解决]]></title>
+        <id>https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/</id>
+        <link href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
+        </link>
+        <updated>2020-07-09T06:44:16.000Z</updated>
+        <content type="html"><![CDATA[<p>antd版本：4.3.0<br>
+添加如下css</p>
+<pre><code class="language-css">@Keyframes slAntSlideUpIn {
+0% {
+transform: scaleY(0.8);
+transform-origin: 0% 0%;
+opacity: 0;
+}
+110% {
+transform: scaleY(1);
+transform-origin: 0% 0%;
+opacity: 1;
+}
+}
+.slide-up-enter.slide-up-enter-active,
+.slide-up-appear.slide-up-appear-active {
+animation-name: slAntSlideUpIn;
+animation-play-state: running;
+}
+
+@Keyframes slAntSlideDownIn {
+0% {
+transform: scaleY(0.8);
+transform-origin: 100% 100%;
+opacity: 0;
+}
+110% {
+transform: scaleY(1);
+transform-origin: 100% 100%;
+opacity: 1;
+}
+}
+
+.slide-down-enter.slide-down-enter-active,
+.slide-down-appear.slide-down-appear-active {
+animation-name: slAntSlideDownIn;
+animation-play-state: running;
+}
+
+.ant-select-dropdown.slide-up-enter.slide-up-enter-active.ant-select-dropdown-placement-bottomLeft,
+.ant-select-dropdown.slide-up-appear.slide-up-appear-active.ant-select-dropdown-placement-bottomLeft {
+animation-name: slAntSlideUpIn;
+}
+</code></pre>
+<p>Github上有人提出了这个bug，结果半年都没fix😞<br>
+<br/></p>
+<p>参考链接：<br>
+<a href="">https://github.com/ant-design/ant-design/issues/21039</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[create-react-app + Ant Design兼容IE11]]></title>
+        <id>https://gonlua.github.io/post/create-react-app-ant-design-jian-rong-ie11/</id>
+        <link href="https://gonlua.github.io/post/create-react-app-ant-design-jian-rong-ie11/">
+        </link>
+        <updated>2020-07-09T06:33:21.000Z</updated>
+        <content type="html"><![CDATA[<ol>
+<li>安装react-app-polyfill (我安装create-react-app后默认就装了)</li>
+<li>在index.js最最上方添加</li>
+</ol>
+<pre><code class="language-js">import &quot;react-app-polyfill/ie11&quot;;
+import &quot;react-app-polyfill/stable&quot;;
+</code></pre>
+<ol start="3">
+<li>在package.json中的browserslist中添加ie 11:</li>
+</ol>
+<pre><code class="language-json">&quot;browserslist&quot;: {
+    &quot;production&quot;: [
+      &quot;&gt;0.2%&quot;,
+      &quot;not dead&quot;,
+      &quot;not op_mini all&quot;,
+      &quot;ie 11&quot;
+    ],
+    &quot;development&quot;: [
+      &quot;last 1 chrome version&quot;,
+      &quot;last 1 firefox version&quot;,
+      &quot;last 1 safari version&quot;,
+      &quot;ie 11&quot;
+    ]
+  }
+</code></pre>
+<ol start="4">
+<li>配置好后，Ant Design也支持了</li>
+</ol>
+<p>参考文章：<br>
+<a href="https://segmentfault.com/a/1190000021480321">create-react-app兼容ie11配置</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[React应用发布部署到Apache服务器]]></title>
+        <id>https://gonlua.github.io/post/react-ying-yong-fa-bu-bu-shu-dao-apache-fu-wu-qi/</id>
+        <link href="https://gonlua.github.io/post/react-ying-yong-fa-bu-bu-shu-dao-apache-fu-wu-qi/">
+        </link>
+        <updated>2020-07-09T05:45:25.000Z</updated>
+        <content type="html"><![CDATA[<p>Apache版本：2.2.3<br>
+React版本：16.13.1</p>
+<h1 id="apache部分">Apache部分</h1>
+<h2 id="1-配置允许地址重写">1. 配置允许地址重写</h2>
+<p>对于使用了Router的单页面React应用，浏览器范围的地址是虚拟的，没有对应的资源，所以需要将访问地址都重写为index.html</p>
+<ol>
+<li>打开Apache配置文件httpd.conf</li>
+<li>添加配置，允许路径被重写</li>
+</ol>
+<pre><code>&lt;Directory /htdocs/XXX&gt;
+Options all
+AllowOverride all
+Order allow,deny
+allow from all
+&lt;/Directory&gt;
+</code></pre>
+<ol start="3">
+<li>重启Apache<br>
+<br/></li>
+</ol>
+<h2 id="2-配置地址重写规则">2. 配置地址重写规则</h2>
+<p>在React项目的public目录下添加.htaccess文件（打包后会在网站的根目录）<br>
+添加如下内容：</p>
+<pre><code>RewriteEngine On
+RewriteCond %{REQUEST_URI} !^index\.html$
+RewriteCond %{REQUEST_URI} !\.(css|gif|ico|jpg|js|png|swf|txt|svg|woff|ttf|eot)&amp;
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . index.html [L]
+</code></pre>
+<p>具体的语法参考：</p>
+<blockquote>
+<p><a href="https://www.jianshu.com/p/9f9c0284b964">Apache Rewrite 初学记录</a></p>
+</blockquote>
+<br/>
+<h1 id="react部分">React部分</h1>
+<h2 id="1-配置二级目录">1. 配置二级目录</h2>
+<p>应用服务器里一般不只有一个应用，一般每个应用都会放在一个二级目录里，如htdocs/XXX，React里要做相应的配置</p>
+<ol>
+<li>在package.json里添加&quot;homepage&quot;:&quot;/XXX&quot; ，这个是指定资源的访问路径，即<code>%PUBLIC_URL%</code><br>
+然后在index.html的head里的最上方添加<code>&lt;base href=&quot;%PUBLIC_URL%/&quot;&gt;</code>，统一添加前缀。</li>
+<li>给Router添加basename属性，可以根据环境决定是否添加</li>
+</ol>
+<pre><code class="language-jsx">const isProd = process.env.NODE_ENV === 'production'
+&lt;Router basename={isProd?'/XXX':'/'}&gt;
+&lt;/Router&gt;
+</code></pre>
+<h2 id="2-发布">2. 发布</h2>
+<p>运行build命令，然后将build目录下的文件拷贝到htdocs/XXX下就可以了<br>
+<br/></p>
+<p>参考文章：</p>
+<blockquote>
+<p><a href="https://skryvets.com/blog/2018/09/20/an-elegant-solution-of-deploying-react-app-into-a-subdirectory/">An elegant solution of deploying React app into a subdirectory</a></p>
+</blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[SpringBoot解决跨域问题/跨域与拦截器冲突问题]]></title>
+        <id>https://gonlua.github.io/post/springboot-jie-jue-kua-yu-wen-ti-kua-yu-yu-lan-jie-qi-chong-tu-wen-ti/</id>
+        <link href="https://gonlua.github.io/post/springboot-jie-jue-kua-yu-wen-ti-kua-yu-yu-lan-jie-qi-chong-tu-wen-ti/">
+        </link>
+        <updated>2020-07-09T05:20:21.000Z</updated>
+        <content type="html"><![CDATA[<p>跨域问题可以从前端或者后端解决，这里是后端SpringBoot的解决方法：</p>
+<p>方法一：<br>
+在Spring配置里添加CorsMapping，允许跨域：</p>
+<pre><code class="language-java">@Configuration
+public class InterceptorConfig extends WebMvcConfigurationSupport {
+
+    @Override
+	protected void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping(&quot;/**&quot;)
+            .allowedOrigins(&quot;*&quot;) //允许来源域名
+            .allowCredentials(true)
+            .allowedMethods(&quot;GET&quot;, &quot;POST&quot;, &quot;DELETE&quot;, &quot;PUT&quot;,&quot;PATCH&quot;)
+            .allowedHeaders(&quot;*&quot;);
+	}
+	
+}
+</code></pre>
+<br/>
+<p>但是这样添加的Mapping是在拦截器之后执行的，所以像登陆验证这样的拦截器不通过时，直接返回结果就还是会有跨域问题，所以要使用另一个方法，添加CorsFilter，因为Filter是在拦截器之前执行的，所以没有这个问题：</p>
+<p>方法二：</p>
+<pre><code class="language-Java">@Configuration
+public class CorsFilterConfig {
+
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin(&quot;*&quot;);
+        config.setAllowCredentials(true);
+        config.addAllowedMethod(&quot;*&quot;);
+        config.addAllowedHeader(&quot;*&quot;);
+        UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
+        configSource.registerCorsConfiguration(&quot;/**&quot;, config);
+        return new CorsFilter(configSource);
+    }
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[MySQL 时间日期加减函数]]></title>
+        <id>https://gonlua.github.io/post/mysql-shi-jian-ri-qi-jia-jian-han-shu/</id>
+        <link href="https://gonlua.github.io/post/mysql-shi-jian-ri-qi-jia-jian-han-shu/">
+        </link>
+        <updated>2020-07-09T03:46:35.000Z</updated>
+        <content type="html"><![CDATA[<p>DATE_ADD(date,INTERVAL expr type)  增加指定时间间隔<br>
+DATE_SUB(date,INTERVAL expr type)  减少指定时间间隔</p>
+<p>例子：<br>
+DATE_SUB(date, INTERVAL 1 HOUR) 减少1小时</p>
+<p>type可取的值：</p>
+<ul>
+<li>MICROSECOND</li>
+<li>SECOND</li>
+<li>MINUTE</li>
+<li>HOUR</li>
+<li>DAY</li>
+<li>WEEK</li>
+<li>MONTH</li>
+<li>QUARTER</li>
+<li>YEAR</li>
+<li>SECOND_MICROSECOND</li>
+<li>MINUTE_MICROSECOND</li>
+<li>MINUTE_SECOND</li>
+<li>HOUR_MICROSECOND</li>
+<li>HOUR_SECOND</li>
+<li>HOUR_MINUTE</li>
+<li>DAY_MICROSECOND</li>
+<li>DAY_SECOND</li>
+<li>DAY_MINUTE</li>
+<li>DAY_HOUR</li>
+<li>YEAR_MONTH</li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Hello Gridea]]></title>
+        <id>https://gonlua.github.io/post/hello-gridea/</id>
+        <link href="https://gonlua.github.io/post/hello-gridea/">
+        </link>
+        <updated>2018-12-11T16:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
+✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
+✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+<!-- more -->
+<p><a href="https://github.com/getgridea/gridea">Github</a><br>
+<a href="https://gridea.dev/">Gridea 主页</a><br>
+<a href="http://fehey.com/">示例网站</a></p>
+<h2 id="特性">特性👇</h2>
+<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
+<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
+<p>🏷️  你可以对文章进行标签分组</p>
+<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
+<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
+<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
+<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
+<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
+<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
+<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
+<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
+<p>未来，它一定会成为你离不开的伙伴</p>
+<p>尽情发挥你的才华吧！</p>
+<p>😘 Enjoy~</p>
+]]></content>
+    </entry>
+</feed>
