@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://gonlua.github.io</id>
     <title>gonlua&apos;s blog</title>
-    <updated>2020-07-09T10:15:40.061Z</updated>
+    <updated>2020-07-10T10:21:52.248Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://gonlua.github.io"/>
     <link rel="self" href="https://gonlua.github.io/atom.xml"/>
@@ -10,6 +10,37 @@
     <logo>https://gonlua.github.io/images/avatar.png</logo>
     <icon>https://gonlua.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, gonlua&apos;s blog</rights>
+    <entry>
+        <title type="html"><![CDATA[SpringBoot用Actuator的shutdown不能关闭进程的解决方法]]></title>
+        <id>https://gonlua.github.io/post/springboot-yong-actuator-de-shutdown-ming-ling-bu-neng-guan-bi-jin-cheng-jie-jue/</id>
+        <link href="https://gonlua.github.io/post/springboot-yong-actuator-de-shutdown-ming-ling-bu-neng-guan-bi-jin-cheng-jie-jue/">
+        </link>
+        <updated>2020-07-10T09:45:34.000Z</updated>
+        <content type="html"><![CDATA[<p>如果使用了scheduler（我用的是quartz），会阻止进程关闭。</p>
+<p>解决方法是在Bean销毁前停掉scheduler:</p>
+<pre><code class="language-java">@PreDestroy
+public void preDestroy() {
+    if (scheduler!=null) {
+        try {
+            scheduler.shutdown();
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[React打包war]]></title>
+        <id>https://gonlua.github.io/post/react-da-bao-war/</id>
+        <link href="https://gonlua.github.io/post/react-da-bao-war/">
+        </link>
+        <updated>2020-07-10T00:09:54.000Z</updated>
+        <content type="html"><![CDATA[<p>参考文章：<br>
+<a href="https://www.megadix.it/blog/create-react-app-servlet/">Deploy React Applications in a Servlet Environment</a></p>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[SpringBoot兼容java 6]]></title>
         <id>https://gonlua.github.io/post/springboot-jian-rong-java-6/</id>

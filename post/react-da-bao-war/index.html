@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>SpringBoot解决跨域问题/跨域与拦截器冲突问题 | gonlua&#39;s blog</title>
+<title>React打包war | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,12 +18,10 @@
 
 
 
-    <meta name="description" content="跨域问题可以从前端或者后端解决，这里是后端SpringBoot的解决方法：
-方法一：
-在Spring配置里添加CorsMapping，允许跨域：
-@Configuration
-public class InterceptorConfig e..." />
-    <meta name="keywords" content="Cors,SpringBoot" />
+    <meta name="description" content="参考文章：
+Deploy React Applications in a Servlet Environment
+..." />
+    <meta name="keywords" content="React" />
   </head>
   <body>
     <div id="app" class="main">
@@ -94,57 +92,19 @@ public class InterceptorConfig e..." />
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">SpringBoot解决跨域问题/跨域与拦截器冲突问题</h2>
-            <div class="post-date">2020-07-09</div>
+            <h2 class="post-title">React打包war</h2>
+            <div class="post-date">2020-07-10</div>
             
             <div class="post-content" v-pre>
-              <p>跨域问题可以从前端或者后端解决，这里是后端SpringBoot的解决方法：</p>
-<p>方法一：<br>
-在Spring配置里添加CorsMapping，允许跨域：</p>
-<pre><code class="language-java">@Configuration
-public class InterceptorConfig extends WebMvcConfigurationSupport {
-
-    @Override
-	protected void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping(&quot;/**&quot;)
-            .allowedOrigins(&quot;*&quot;) //允许来源域名
-            .allowCredentials(true)
-            .allowedMethods(&quot;GET&quot;, &quot;POST&quot;, &quot;DELETE&quot;, &quot;PUT&quot;,&quot;PATCH&quot;)
-            .allowedHeaders(&quot;*&quot;);
-	}
-	
-}
-</code></pre>
-<br/>
-<p>但是这样添加的Mapping是在拦截器之后执行的，所以像登陆验证这样的拦截器不通过时，直接返回结果就还是会有跨域问题，所以要使用另一个方法，添加CorsFilter，因为Filter是在拦截器之前执行的，所以没有这个问题：</p>
-<p>方法二：</p>
-<pre><code class="language-Java">@Configuration
-public class CorsFilterConfig {
-
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin(&quot;*&quot;);
-        config.setAllowCredentials(true);
-        config.addAllowedMethod(&quot;*&quot;);
-        config.addAllowedHeader(&quot;*&quot;);
-        UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
-        configSource.registerCorsConfiguration(&quot;/**&quot;, config);
-        return new CorsFilter(configSource);
-    }
-}
-</code></pre>
+              <p>参考文章：<br>
+<a href="https://www.megadix.it/blog/create-react-app-servlet/">Deploy React Applications in a Servlet Environment</a></p>
 
             </div>
             
               <div class="tag-container">
                 
-                  <a href="https://gonlua.github.io/tag/9-t_2JYlw/" class="tag">
-                    Cors
-                  </a>
-                
-                  <a href="https://gonlua.github.io/tag/K-cma7AF-/" class="tag">
-                    SpringBoot
+                  <a href="https://gonlua.github.io/tag/yaCn0lSnI/" class="tag">
+                    React
                   </a>
                 
               </div>
@@ -152,9 +112,9 @@ public class CorsFilterConfig {
             
               <div class="next-post">
                 <div class="next">下一篇</div>
-                <a href="https://gonlua.github.io/post/mysql-shi-jian-ri-qi-jia-jian-han-shu/">
+                <a href="https://gonlua.github.io/post/springboot-jian-rong-java-6/">
                   <h3 class="post-title">
-                    MySQL 时间日期加减函数
+                    SpringBoot兼容java 6
                   </h3>
                 </a>
               </div>
