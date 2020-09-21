@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>关于 | gonlua&#39;s blog</title>
+<title>Content Security Policy | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,14 +18,10 @@
 
 
 
-    <meta name="description" content="
-欢迎来到我的小站呀，很高兴遇见你！🤝
-
-🏠 关于本站
-👨‍💻 博主是谁
-⛹ 兴趣爱好
-📬 联系我呀
-..." />
+    <meta name="description" content="“网页安全政策”CSP可以有效防止XSS(Cross Site Scriping)攻击。
+内网的网站可以利用它防止某些插件链接到外部。
+使用方法很简单，在html加入meta标签，例子：
+&lt;meta http-equiv=&quot;..." />
     <meta name="keywords" content="" />
   </head>
   <body>
@@ -97,20 +93,50 @@
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
-            <h2 class="post-title">关于</h2>
-            <div class="post-date">2019-01-25</div>
+            <h2 class="post-title">Content Security Policy</h2>
+            <div class="post-date">2020-07-13</div>
             
             <div class="post-content" v-pre>
-              <blockquote>
-<p>欢迎来到我的小站呀，很高兴遇见你！🤝</p>
-</blockquote>
-<h2 id="关于本站">🏠 关于本站</h2>
-<h2 id="博主是谁">👨‍💻 博主是谁</h2>
-<h2 id="兴趣爱好">⛹ 兴趣爱好</h2>
-<h2 id="联系我呀">📬 联系我呀</h2>
+              <p>“网页安全政策”CSP可以有效防止XSS(Cross Site Scriping)攻击。<br>
+内网的网站可以利用它防止某些插件链接到外部。</p>
+<p>使用方法很简单，在html加入meta标签，例子：<br>
+<code>&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org;&quot;&gt;</code></p>
+<p>可以限制的资源类型：</p>
+<ul>
+<li>script-src：外部脚本</li>
+<li>style-src：样式表</li>
+<li>img-src：图像</li>
+<li>media-src：媒体文件（音频和视频）</li>
+<li>font-src：字体文件</li>
+<li>object-src：插件（比如 Flash）</li>
+<li>child-src：框架</li>
+<li>frame-ancestors：嵌入的外部资源（比如&lt;frame&gt;、&lt;iframe&gt;、&lt;embed&gt;和&lt;applet&gt;）</li>
+<li>connect-src：HTTP 连接（通过 XHR、WebSockets、EventSource等）</li>
+<li>worker-src：worker脚本</li>
+<li>manifest-src：manifest 文件<br>
+<br/></li>
+<li>default-src： 默认规则</li>
+<li>'unsafe-inline': 允许执行页面内嵌的标签和事件监听函数</li>
+</ul>
+<p>规则默认只对ftp和https(s)有效，如果要允许Websocket，要加入&quot;ws:&quot;<br>
+<code>&lt;meta http-equiv=&quot;Content-Security-Policy&quot; content=&quot;default-src 'self' data: gap: ws: ssl.gstatic.com 'unsafe-inline';&quot;&gt;</code><br>
+<br/><br>
+兼容性：<br>
+<img src="https://gonlua.github.io/post-images/1594606274392.png" alt="" loading="lazy"></p>
+<p>参考文章：<br>
+<a href="https://content-security-policy.com/">Content Security Policy Reference</a></p>
 
             </div>
             
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/springboot-yong-actuator-de-shutdown-ming-ling-bu-neng-guan-bi-jin-cheng-jie-jue/">
+                  <h3 class="post-title">
+                    SpringBoot用Actuator的shutdown不能关闭进程的解决方法
+                  </h3>
+                </a>
+              </div>
             
 
             

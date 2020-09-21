@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Gridea | gonlua&#39;s blog</title>
+<title>create-react-app 阻止build打包service-worker | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,10 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="即使没有使用service-worker，build时仍然会将其打包。
+如果不想打包，可以去webpack.config.js里注释掉相关代码。
+位置：node_modules\react-scripts\config\webpack.co..." />
+    <meta name="keywords" content="" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,35 +91,49 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: Gridea</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/hello-gridea/">
-                  <h2 class="post-title">Hello Gridea</h2>
-                </a>
-                <div class="post-date">
-                  2018-12-12
-                </div>
-                <div class="post-abstract">
-                  <p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+          <div class="post-detail">
+            <h2 class="post-title">create-react-app 阻止build打包service-worker</h2>
+            <div class="post-date">2020-07-13</div>
+            
+            <div class="post-content" v-pre>
+              <p>即使没有使用service-worker，build时仍然会将其打包。<br>
+如果不想打包，可以去webpack.config.js里注释掉相关代码。<br>
+位置：node_modules\react-scripts\config\webpack.config.js</p>
+<p>将这一段注释掉：</p>
+<pre><code class="language-js">isEnvProduction &amp;&amp;
+    new WorkboxWebpackPlugin.GenerateSW({
+        clientsClaim: true,
+        exclude: [/\.map$/, /asset-manifest\.json$/],
+        importWorkboxFrom: 'cdn',
+        navigateFallback: paths.publicUrlOrPath + 'index.html',
+        navigateFallbackBlacklist: [
+        // Exclude URLs starting with /_, as they're likely an API call
+        new RegExp('^/_'),
+        // Exclude any URLs whose last part seems to be a file extension
+        // as they're likely a resource and not a SPA route.
+        // URLs containing a &quot;?&quot; character won't be blacklisted as they're likely
+        // a route with query params (e.g. auth callbacks).
+        new RegExp('/[^/?]+\\.[^/]+$'),
+        ],
+    }),
+</code></pre>
 
-                </div>
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/content-security-policy/">
+                  <h3 class="post-title">
+                    Content Security Policy
+                  </h3>
+                </a>
               </div>
-              
-                <a class="right" href="https://gonlua.github.io/post/hello-gridea/">
-                  <div class="feature-container" style="background-image: url('https://gonlua.github.io/post-images/hello-gridea.png')">
-                  </div>
-                </a>
-              
-            </article>
-          
+            
 
-          <div class="pagination-container">
-  
-  
-</div>
+            
+
+          </div>
 
         </div>
       </div>

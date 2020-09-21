@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>Gridea | gonlua&#39;s blog</title>
+<title>Android模拟器修改host | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,26 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="执行以下命令：
+
+root获取root权限
+
+adb root
+
+
+重新挂载
+
+adb remount
+
+
+把hosts文件拉出来
+
+adb pull /system/etc/hosts hosts
+
+
+修改hosts文件
+把hosts文件..." />
+    <meta name="keywords" content="Android" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,35 +107,75 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: Gridea</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/hello-gridea/">
-                  <h2 class="post-title">Hello Gridea</h2>
-                </a>
-                <div class="post-date">
-                  2018-12-12
-                </div>
-                <div class="post-abstract">
-                  <p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
-✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+          <div class="post-detail">
+            <h2 class="post-title">Android模拟器修改host</h2>
+            <div class="post-date">2020-07-17</div>
+            
+            <div class="post-content" v-pre>
+              <p>执行以下命令：</p>
+<ul>
+<li>root获取root权限
+<ul>
+<li>adb root</li>
+</ul>
+</li>
+<li>重新挂载
+<ul>
+<li>adb remount</li>
+</ul>
+</li>
+<li>把hosts文件拉出来
+<ul>
+<li>adb pull /system/etc/hosts hosts</li>
+</ul>
+</li>
+<li>修改hosts文件</li>
+<li>把hosts文件push回去
+<ul>
+<li>adb push hosts /system/etc/hosts</li>
+</ul>
+</li>
+</ul>
+<p>我到了这一步提示(Android版本是7.1.1)<br>
+<code>adb: error: failed to copy 'hosts' to '/system/etc/hosts': couldn't create file: Read-only file system</code></p>
+<p>解决方法(我的adb版本：1.0.36)：</p>
+<ul>
+<li>adb push hosts /system/etc/hosts</li>
+<li>adb root</li>
+<li>adb shell</li>
+<li>mount</li>
+<li>exit</li>
+<li>adb disable-verity</li>
+<li>adb reboot</li>
+<li>adb root</li>
+<li>adb remount</li>
+</ul>
+<p>现在就可以进行写操作了</p>
 
-                </div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/fGQw5XsA3/" class="tag">
+                    Android
+                  </a>
+                
               </div>
-              
-                <a class="right" href="https://gonlua.github.io/post/hello-gridea/">
-                  <div class="feature-container" style="background-image: url('https://gonlua.github.io/post-images/hello-gridea.png')">
-                  </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/create-react-app-zu-zhi-build-da-bao-service-worker/">
+                  <h3 class="post-title">
+                    create-react-app 阻止build打包service-worker
+                  </h3>
                 </a>
-              
-            </article>
-          
+              </div>
+            
 
-          <div class="pagination-container">
-  
-  
-</div>
+            
+
+          </div>
 
         </div>
       </div>
