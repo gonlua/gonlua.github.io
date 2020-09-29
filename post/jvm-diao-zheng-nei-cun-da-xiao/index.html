@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>IE11 | gonlua&#39;s blog</title>
+<title>JVM调整内存大小 | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,13 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="在catalina.sh里添加：
+JAVA_OPTS='-Xms512m -Xmx512m -XX:PermSize=512m -XX:MaxPermSize=512m'
+其中：
+Xms: 最小堆大小
+Xmx: 最大堆大小
+XX:PermS..." />
+    <meta name="keywords" content="Java,Linux" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +94,53 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: IE11</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
-                  <h2 class="post-title">antd Select组件在IE11下闪烁问题解决</h2>
-                </a>
-                <div class="post-date">
-                  2020-07-09
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">JVM调整内存大小</h2>
+            <div class="post-date">2020-09-21</div>
+            
+            <div class="post-content" v-pre>
+              <p>在catalina.sh里添加：<br>
+<code>JAVA_OPTS='-Xms512m -Xmx512m -XX:PermSize=512m -XX:MaxPermSize=512m'</code></p>
+<p>其中：<br>
+Xms: 最小堆大小<br>
+Xmx: 最大堆大小<br>
+XX:PermSize: 永久代初始值 (默认为物理内存的1/64)<br>
+XX:MaxPermSize: 永久代最大值 (默认为物理内存的1/4)</p>
+<p>JVM内存区域分为三种</p>
+<ol>
+<li>新生代：主要用来存放新生的对象，会频繁触发MinorGC。</li>
+<li>老年代：主要存放应用中生命周期长的内存对象。没那么频繁地触发MajorGC。</li>
+<li>永久代：永久保存区域，主要存放Class和Meta信息，难以被回收。</li>
+</ol>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/3cQ80rwvT/" class="tag">
+                    Java
+                  </a>
+                
+                  <a href="https://gonlua.github.io/tag/KyvBMZOYN/" class="tag">
+                    Linux
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/android-mo-ni-qi-xiu-gai-host/">
+                  <h3 class="post-title">
+                    Android模拟器修改host
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>

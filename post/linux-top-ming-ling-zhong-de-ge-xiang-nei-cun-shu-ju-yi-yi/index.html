@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>IE11 | gonlua&#39;s blog</title>
+<title>Linux 查看内存使用 | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,14 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="使用top命令，按M按内存占用排序，内存相关列的意义如下：
+VIRT: 程序申请的内存，不管真的用了没有。
+RES: 真实使用了的内存，和%MEM对应。
+SHR: 共享内存
+DATA：数据占用的内存 (按f显示)
+
+使用free命令可以看到..." />
+    <meta name="keywords" content="Java,Linux" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +95,50 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: IE11</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
-                  <h2 class="post-title">antd Select组件在IE11下闪烁问题解决</h2>
-                </a>
-                <div class="post-date">
-                  2020-07-09
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">Linux 查看内存使用</h2>
+            <div class="post-date">2020-09-21</div>
+            
+            <div class="post-content" v-pre>
+              <p>使用top命令，按M按内存占用排序，内存相关列的意义如下：<br>
+VIRT: 程序申请的内存，不管真的用了没有。<br>
+RES: 真实使用了的内存，和%MEM对应。<br>
+SHR: 共享内存<br>
+DATA：数据占用的内存 (按f显示)<br>
+<img src="https://gonlua.github.io/post-images/1600660201087.png" alt="" loading="lazy"></p>
+<p>使用free命令可以看到总的内存使用情况 （-m -g 切换单位）<br>
+<img src="https://gonlua.github.io/post-images/1600664902335.png" alt="" loading="lazy"></p>
+<p>可以看到top里的%MEM加起来大概只有30%，为什么free里已用内存达到了7471？<br>
+这是因为linux内核会消耗尽量多的内存来提供缓存，我们应该看第二行(-/+ buffers/cache)的值，才是真正的程序已使用内存。</p>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/3cQ80rwvT/" class="tag">
+                    Java
+                  </a>
+                
+                  <a href="https://gonlua.github.io/tag/KyvBMZOYN/" class="tag">
+                    Linux
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/li-yong-java-visualvm-yuan-cheng-jian-kong-java-cheng-xu/">
+                  <h3 class="post-title">
+                    利用Java VisualVM远程监控JAVA程序
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>

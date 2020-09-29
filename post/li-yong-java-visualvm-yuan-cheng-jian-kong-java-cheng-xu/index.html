@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>IE11 | gonlua&#39;s blog</title>
+<title>利用Java VisualVM远程监控JAVA程序 | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,13 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="服务器端
+想要监控服务器端的程序，需要先在服务器端允许jstatd:
+
+在服务器JDK的bin目录下创建文件jstatd.all.policy, 添加内容：
+
+grant codebase &quot;file:${java.home}/...." />
+    <meta name="keywords" content="Java,Linux" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +94,61 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: IE11</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
-                  <h2 class="post-title">antd Select组件在IE11下闪烁问题解决</h2>
-                </a>
-                <div class="post-date">
-                  2020-07-09
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">利用Java VisualVM远程监控JAVA程序</h2>
+            <div class="post-date">2020-09-21</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="服务器端">服务器端</h2>
+<h3 id="想要监控服务器端的程序需要先在服务器端允许jstatd">想要监控服务器端的程序，需要先在服务器端允许jstatd:</h3>
+<ol>
+<li>在服务器JDK的bin目录下创建文件jstatd.all.policy, 添加内容：</li>
+</ol>
+<pre><code class="language-json">grant codebase &quot;file:${java.home}/../lib/tools.jar&quot; {
+    permission java.security.AllPermission;
+};
+</code></pre>
+<ol start="2">
+<li>运行命令<br>
+<code>jstatd -J-Djava.security.policy=jstatd.all.policy -J-Djava.rmi.server.hostname=192.168.XX.X -J-Djava.rmi.server.logCalls=true</code></li>
+</ol>
+<h2 id="客户端">客户端</h2>
+<ol>
+<li>在自己电脑，进入JDK的bin目录（最后JDK大版本和服务器的一致，不然有些监控看不到）</li>
+<li>运行jvisualvm.exe</li>
+<li>在左边的Remote右击添加远程服务器：<br>
+<img src="https://gonlua.github.io/post-images/1600655034024.png" alt="" loading="lazy"><br>
+就可以看到服务器上的Java程序，进行监控了。</li>
+</ol>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/3cQ80rwvT/" class="tag">
+                    Java
+                  </a>
+                
+                  <a href="https://gonlua.github.io/tag/KyvBMZOYN/" class="tag">
+                    Linux
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/jvm-diao-zheng-nei-cun-da-xiao/">
+                  <h3 class="post-title">
+                    JVM调整内存大小
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>

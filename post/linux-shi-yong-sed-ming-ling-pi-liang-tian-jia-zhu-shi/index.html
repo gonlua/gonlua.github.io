@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>IE11 | gonlua&#39;s blog</title>
+<title>Linux使用sed命令批量添加注释 | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,14 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="有一批配置文件，里面都有一行配置如下：
+System1:
+System1.Pool.Filters=stat
+System2:
+System2.Pool.Filters=stat
+.......
+现在想要批量给这一行配置添加注释（前面添加#..." />
+    <meta name="keywords" content="Linux" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +95,50 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: IE11</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
-                  <h2 class="post-title">antd Select组件在IE11下闪烁问题解决</h2>
-                </a>
-                <div class="post-date">
-                  2020-07-09
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">Linux使用sed命令批量添加注释</h2>
+            <div class="post-date">2020-09-21</div>
+            
+            <div class="post-content" v-pre>
+              <p>有一批配置文件，里面都有一行配置如下：<br>
+System1:<br>
+<code>System1.Pool.Filters=stat</code></p>
+<p>System2:<br>
+<code>System2.Pool.Filters=stat</code></p>
+<p>.......</p>
+<p>现在想要批量给这一行配置添加注释（前面添加#号）<br>
+可以使用sed命令：<br>
+<code>sed -i 's/.*Pool.Filters=stat$/#&amp;/' ./*</code><br>
+-i 表示修改文件（默认是输出到终端，不修改文件）<br>
+s 表示替换字符串<br>
+.*Pool.Filters=stat$ 表示原字符串, .<em>是通配符，$表示结尾<br>
+#&amp; 表示替换字符串，&amp;引用原字符串<br>
+./</em> 表示在当前文件夹所有文件中替换</p>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/KyvBMZOYN/" class="tag">
+                    Linux
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/linux-top-ming-ling-zhong-de-ge-xiang-nei-cun-shu-ju-yi-yi/">
+                  <h3 class="post-title">
+                    Linux 查看内存使用
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>

@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://gonlua.github.io</id>
     <title>gonlua&apos;s blog</title>
-    <updated>2020-09-21T00:32:17.199Z</updated>
+    <updated>2020-09-29T08:31:43.190Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://gonlua.github.io"/>
     <link rel="self" href="https://gonlua.github.io/atom.xml"/>
@@ -10,6 +10,128 @@
     <logo>https://gonlua.github.io/images/avatar.png</logo>
     <icon>https://gonlua.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, gonlua&apos;s blog</rights>
+    <entry>
+        <title type="html"><![CDATA[Jetson Nano视频采集的一些知识]]></title>
+        <id>https://gonlua.github.io/post/jetson-nano-shi-pin-cai-ji-de-yi-xie-zhi-shi/</id>
+        <link href="https://gonlua.github.io/post/jetson-nano-shi-pin-cai-ji-de-yi-xie-zhi-shi/">
+        </link>
+        <updated>2020-09-24T05:22:17.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="uvc和v4l2的关系">UVC和V4L2的关系</h2>
+<ul>
+<li>UVC(USB Video Class)是一种usb视频设备驱动。用来支持usb视频设备，凡是usb接口的摄像头都能够支持</li>
+<li>V4L2 (VIdeo4Linux2)是Linux下的视频采集框架。用来统一接口，向应用层提供API.</li>
+<li>简单的讲V4L2就是用来管理UVC设备的并且能够提供视频相关的一些API。</li>
+</ul>
+<h3 id="查找是否有视频类借口信息">查找是否有视频类借口信息</h3>
+<p><code>lsusb -d VID：PID -v | grep &quot;14 Video&quot;</code><br>
+如果兼容UVC，则会输出类似信息<br>
+bFunctionClass 14 Video<br>
+bInterfaceClass 14 Video<br>
+如果没有以上信息，则是non-UVC设备。</p>
+<h3 id="查看usb视频设备信息的命令查看支持的图像格式">查看usb视频设备信息的命令(查看支持的图像格式)：</h3>
+<pre><code>sudo apt-get install v4l-utils
+v4l2-ctl --list-formats-ext -d /dev/video0
+</code></pre>
+<p>目前很多免驱的VGA2USB视频采集卡都是将利用了UVC，达到免驱的效果。</p>
+<p>从Jetson Nano的软件技术文档可以得知其支持UVC:<br>
+<img src="https://gonlua.github.io/post-images/1600925368069.png" alt="" loading="lazy"></p>
+<p>因为Jetson Nano可以直接读取采集卡图像/视频<br>
+打开设备：<br>
+<code>./video-viewer.py v4l2:///dev/video0</code><br>
+获取一帧图像并识别：<br>
+<code>./imagenet.py /dev/video0</code></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Linux使用sed命令批量添加注释]]></title>
+        <id>https://gonlua.github.io/post/linux-shi-yong-sed-ming-ling-pi-liang-tian-jia-zhu-shi/</id>
+        <link href="https://gonlua.github.io/post/linux-shi-yong-sed-ming-ling-pi-liang-tian-jia-zhu-shi/">
+        </link>
+        <updated>2020-09-21T08:26:00.000Z</updated>
+        <content type="html"><![CDATA[<p>有一批配置文件，里面都有一行配置如下：<br>
+System1:<br>
+<code>System1.Pool.Filters=stat</code></p>
+<p>System2:<br>
+<code>System2.Pool.Filters=stat</code></p>
+<p>.......</p>
+<p>现在想要批量给这一行配置添加注释（前面添加#号）<br>
+可以使用sed命令：<br>
+<code>sed -i 's/.*Pool.Filters=stat$/#&amp;/' ./*</code><br>
+-i 表示修改文件（默认是输出到终端，不修改文件）<br>
+s 表示替换字符串<br>
+.*Pool.Filters=stat$ 表示原字符串, .<em>是通配符，$表示结尾<br>
+#&amp; 表示替换字符串，&amp;引用原字符串<br>
+./</em> 表示在当前文件夹所有文件中替换</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Linux 查看内存使用]]></title>
+        <id>https://gonlua.github.io/post/linux-top-ming-ling-zhong-de-ge-xiang-nei-cun-shu-ju-yi-yi/</id>
+        <link href="https://gonlua.github.io/post/linux-top-ming-ling-zhong-de-ge-xiang-nei-cun-shu-ju-yi-yi/">
+        </link>
+        <updated>2020-09-21T03:32:40.000Z</updated>
+        <content type="html"><![CDATA[<p>使用top命令，按M按内存占用排序，内存相关列的意义如下：<br>
+VIRT: 程序申请的内存，不管真的用了没有。<br>
+RES: 真实使用了的内存，和%MEM对应。<br>
+SHR: 共享内存<br>
+DATA：数据占用的内存 (按f显示)<br>
+<img src="https://gonlua.github.io/post-images/1600660201087.png" alt="" loading="lazy"></p>
+<p>使用free命令可以看到总的内存使用情况 （-m -g 切换单位）<br>
+<img src="https://gonlua.github.io/post-images/1600664902335.png" alt="" loading="lazy"></p>
+<p>可以看到top里的%MEM加起来大概只有30%，为什么free里已用内存达到了7471？<br>
+这是因为linux内核会消耗尽量多的内存来提供缓存，我们应该看第二行(-/+ buffers/cache)的值，才是真正的程序已使用内存。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[利用Java VisualVM远程监控JAVA程序]]></title>
+        <id>https://gonlua.github.io/post/li-yong-java-visualvm-yuan-cheng-jian-kong-java-cheng-xu/</id>
+        <link href="https://gonlua.github.io/post/li-yong-java-visualvm-yuan-cheng-jian-kong-java-cheng-xu/">
+        </link>
+        <updated>2020-09-21T02:13:29.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="服务器端">服务器端</h2>
+<h3 id="想要监控服务器端的程序需要先在服务器端允许jstatd">想要监控服务器端的程序，需要先在服务器端允许jstatd:</h3>
+<ol>
+<li>在服务器JDK的bin目录下创建文件jstatd.all.policy, 添加内容：</li>
+</ol>
+<pre><code class="language-json">grant codebase &quot;file:${java.home}/../lib/tools.jar&quot; {
+    permission java.security.AllPermission;
+};
+</code></pre>
+<ol start="2">
+<li>运行命令<br>
+<code>jstatd -J-Djava.security.policy=jstatd.all.policy -J-Djava.rmi.server.hostname=192.168.XX.X -J-Djava.rmi.server.logCalls=true</code></li>
+</ol>
+<h2 id="客户端">客户端</h2>
+<ol>
+<li>在自己电脑，进入JDK的bin目录（最后JDK大版本和服务器的一致，不然有些监控看不到）</li>
+<li>运行jvisualvm.exe</li>
+<li>在左边的Remote右击添加远程服务器：<br>
+<img src="https://gonlua.github.io/post-images/1600655034024.png" alt="" loading="lazy"><br>
+就可以看到服务器上的Java程序，进行监控了。</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JVM调整内存大小]]></title>
+        <id>https://gonlua.github.io/post/jvm-diao-zheng-nei-cun-da-xiao/</id>
+        <link href="https://gonlua.github.io/post/jvm-diao-zheng-nei-cun-da-xiao/">
+        </link>
+        <updated>2020-09-21T02:03:51.000Z</updated>
+        <content type="html"><![CDATA[<p>在catalina.sh里添加：<br>
+<code>JAVA_OPTS='-Xms512m -Xmx512m -XX:PermSize=512m -XX:MaxPermSize=512m'</code></p>
+<p>其中：<br>
+Xms: 最小堆大小<br>
+Xmx: 最大堆大小<br>
+XX:PermSize: 永久代初始值 (默认为物理内存的1/64)<br>
+XX:MaxPermSize: 永久代最大值 (默认为物理内存的1/4)</p>
+<p>JVM内存区域分为三种</p>
+<ol>
+<li>新生代：主要用来存放新生的对象，会频繁触发MinorGC。</li>
+<li>老年代：主要存放应用中生命周期长的内存对象。没那么频繁地触发MajorGC。</li>
+<li>永久代：永久保存区域，主要存放Class和Meta信息，难以被回收。</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Android模拟器修改host]]></title>
         <id>https://gonlua.github.io/post/android-mo-ni-qi-xiu-gai-host/</id>
@@ -151,384 +273,6 @@ public void preDestroy() {
         <updated>2020-07-10T00:09:54.000Z</updated>
         <content type="html"><![CDATA[<p>参考文章：<br>
 <a href="https://www.megadix.it/blog/create-react-app-servlet/">Deploy React Applications in a Servlet Environment</a></p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[SpringBoot兼容java 6]]></title>
-        <id>https://gonlua.github.io/post/springboot-jian-rong-java-6/</id>
-        <link href="https://gonlua.github.io/post/springboot-jian-rong-java-6/">
-        </link>
-        <updated>2020-07-09T08:32:06.000Z</updated>
-        <content type="html"><![CDATA[<ol>
-<li>降低SpringBoot版本，我用的是1.5.3.RELEASE</li>
-</ol>
-<pre><code class="language-xml">&lt;parent&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
-    &lt;version&gt;1.5.3.RELEASE&lt;/version&gt;
-    &lt;relativePath /&gt;
-&lt;/parent&gt;
-......
-&lt;properties&gt;
-    &lt;java.version&gt;1.6&lt;/java.version&gt;
-&lt;/properties&gt;
-</code></pre>
-<ol start="2">
-<li>使用兼容的内容web服务器: tomcat 7.0.59</li>
-</ol>
-<pre><code class="language-xml">&lt;properties&gt;
-    &lt;tomcat.version&gt;7.0.59&lt;/tomcat.version&gt;
-&lt;/properties&gt;
-......
-&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-tomcat&lt;/artifactId&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;org.apache.tomcat&lt;/groupId&gt;
-    &lt;artifactId&gt;tomcat-juli&lt;/artifactId&gt;
-    &lt;version&gt;${tomcat.version}&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
-<ol start="3">
-<li>安装支持java 6的maven(最后一个版本是3.2.5)并配置</li>
-</ol>
-<pre><code class="language-xml">&lt;properties&gt;
-    &lt;maven.compiler.source&gt;1.6&lt;/maven.compiler.source&gt;
-    &lt;maven.compiler.target&gt;1.6&lt;/maven.compiler.target&gt;
-&lt;/properties&gt;
-......
-&lt;project&gt;
-    ......
-    &lt;build&gt;
-		&lt;finalName&gt;XXX&lt;/finalName&gt;
-		&lt;plugins&gt;
-			&lt;plugin&gt;
-				&lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-				&lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
-				&lt;configuration&gt;
-					&lt;source&gt;${maven.compiler.source}&lt;/source&gt;
-					&lt;target&gt;${maven.compiler.target}&lt;/target&gt;
-				&lt;/configuration&gt;
-			&lt;/plugin&gt;
-		&lt;/plugins&gt;
-	&lt;/build&gt;
-&lt;/project&gt;
-</code></pre>
-<ol start="4">
-<li>如果用到mybatis</li>
-</ol>
-<pre><code class="language-xml">&lt;dependency&gt;
-    &lt;groupId&gt;org.mybatis.spring.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;mybatis-spring-boot-starter&lt;/artifactId&gt;
-    &lt;version&gt;1.1.1&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
-<ol start="5">
-<li>如果用到JWT</li>
-</ol>
-<pre><code class="language-xml">&lt;dependency&gt;
-    &lt;groupId&gt;com.nimbusds&lt;/groupId&gt;
-    &lt;artifactId&gt;nimbus-jose-jwt&lt;/artifactId&gt;
-    &lt;classifier&gt;jdk16&lt;/classifier&gt;
-    &lt;version&gt;4.11.2&lt;/version&gt;
-&lt;/dependency&gt;
-</code></pre>
-<ol start="6">
-<li>降低Jackson版本到2.6.X，我用的是2.6.3</li>
-</ol>
-<pre><code class="language-xml">&lt;properties&gt;
-    &lt;jackson.version&gt;2.6.7&lt;/jackson.version&gt;
-&lt;/properties&gt;
-......
-&lt;project&gt;
-    ......
-	&lt;dependencyManagement&gt;
-		&lt;dependencies&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-annotations&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-core&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-dataformat-csv&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-dataformat-xml&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.dataformat&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-dataformat-yaml&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-datatype-hibernate4&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-datatype-hibernate5&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-datatype-jdk7&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-datatype-jdk8&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-datatype-joda&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.datatype&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-datatype-jsr310&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-jaxrs-base&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.jaxrs&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-jaxrs-json-provider&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-			&lt;dependency&gt;
-				&lt;groupId&gt;com.fasterxml.jackson.module&lt;/groupId&gt;
-				&lt;artifactId&gt;jackson-module-parameter-names&lt;/artifactId&gt;
-				&lt;version&gt;${jackson.version}&lt;/version&gt;
-			&lt;/dependency&gt;
-		&lt;/dependencies&gt;
-	&lt;/dependencyManagement&gt;
-&lt;/project&gt;
-</code></pre>
-<ol start="7">
-<li>如果用到JTA也要做兼容，具体参考官方文档</li>
-</ol>
-<br/>
-参考官方文档：
-[How to use Java 6](https://docs.spring.io/spring-boot/docs/1.5.x/reference/htmlsingle/#howto-use-java-6)]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[antd Select组件在IE11下闪烁问题解决]]></title>
-        <id>https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/</id>
-        <link href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
-        </link>
-        <updated>2020-07-09T06:44:16.000Z</updated>
-        <content type="html"><![CDATA[<p>antd版本：4.3.0<br>
-添加如下css</p>
-<pre><code class="language-css">@Keyframes slAntSlideUpIn {
-0% {
-transform: scaleY(0.8);
-transform-origin: 0% 0%;
-opacity: 0;
-}
-110% {
-transform: scaleY(1);
-transform-origin: 0% 0%;
-opacity: 1;
-}
-}
-.slide-up-enter.slide-up-enter-active,
-.slide-up-appear.slide-up-appear-active {
-animation-name: slAntSlideUpIn;
-animation-play-state: running;
-}
-
-@Keyframes slAntSlideDownIn {
-0% {
-transform: scaleY(0.8);
-transform-origin: 100% 100%;
-opacity: 0;
-}
-110% {
-transform: scaleY(1);
-transform-origin: 100% 100%;
-opacity: 1;
-}
-}
-
-.slide-down-enter.slide-down-enter-active,
-.slide-down-appear.slide-down-appear-active {
-animation-name: slAntSlideDownIn;
-animation-play-state: running;
-}
-
-.ant-select-dropdown.slide-up-enter.slide-up-enter-active.ant-select-dropdown-placement-bottomLeft,
-.ant-select-dropdown.slide-up-appear.slide-up-appear-active.ant-select-dropdown-placement-bottomLeft {
-animation-name: slAntSlideUpIn;
-}
-</code></pre>
-<p>Github上有人提出了这个bug，结果半年都没fix😞<br>
-<br/></p>
-<p>参考链接：<br>
-<a href="">https://github.com/ant-design/ant-design/issues/21039</a></p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[create-react-app + Ant Design兼容IE11]]></title>
-        <id>https://gonlua.github.io/post/create-react-app-ant-design-jian-rong-ie11/</id>
-        <link href="https://gonlua.github.io/post/create-react-app-ant-design-jian-rong-ie11/">
-        </link>
-        <updated>2020-07-09T06:33:21.000Z</updated>
-        <content type="html"><![CDATA[<ol>
-<li>安装react-app-polyfill (我安装create-react-app后默认就装了)</li>
-<li>在index.js最最上方添加</li>
-</ol>
-<pre><code class="language-js">import &quot;react-app-polyfill/ie11&quot;;
-import &quot;react-app-polyfill/stable&quot;;
-</code></pre>
-<ol start="3">
-<li>在package.json中的browserslist中添加ie 11:</li>
-</ol>
-<pre><code class="language-json">&quot;browserslist&quot;: {
-    &quot;production&quot;: [
-      &quot;&gt;0.2%&quot;,
-      &quot;not dead&quot;,
-      &quot;not op_mini all&quot;,
-      &quot;ie 11&quot;
-    ],
-    &quot;development&quot;: [
-      &quot;last 1 chrome version&quot;,
-      &quot;last 1 firefox version&quot;,
-      &quot;last 1 safari version&quot;,
-      &quot;ie 11&quot;
-    ]
-  }
-</code></pre>
-<ol start="4">
-<li>配置好后，Ant Design也支持了</li>
-</ol>
-<p>参考文章：<br>
-<a href="https://segmentfault.com/a/1190000021480321">create-react-app兼容ie11配置</a></p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[React应用发布部署到Apache服务器]]></title>
-        <id>https://gonlua.github.io/post/react-ying-yong-fa-bu-bu-shu-dao-apache-fu-wu-qi/</id>
-        <link href="https://gonlua.github.io/post/react-ying-yong-fa-bu-bu-shu-dao-apache-fu-wu-qi/">
-        </link>
-        <updated>2020-07-09T05:45:25.000Z</updated>
-        <content type="html"><![CDATA[<p>Apache版本：2.2.3<br>
-React版本：16.13.1</p>
-<h1 id="apache部分">Apache部分</h1>
-<h2 id="1-配置允许地址重写">1. 配置允许地址重写</h2>
-<p>对于使用了Router的单页面React应用，浏览器范围的地址是虚拟的，没有对应的资源，所以需要将访问地址都重写为index.html</p>
-<ol>
-<li>打开Apache配置文件httpd.conf</li>
-<li>添加配置，允许路径被重写</li>
-</ol>
-<pre><code>&lt;Directory /htdocs/XXX&gt;
-Options all
-AllowOverride all
-Order allow,deny
-allow from all
-&lt;/Directory&gt;
-</code></pre>
-<ol start="3">
-<li>重启Apache<br>
-<br/></li>
-</ol>
-<h2 id="2-配置地址重写规则">2. 配置地址重写规则</h2>
-<p>在React项目的public目录下添加.htaccess文件（打包后会在网站的根目录）<br>
-添加如下内容：</p>
-<pre><code>RewriteEngine On
-RewriteCond %{REQUEST_URI} !^index\.html$
-RewriteCond %{REQUEST_URI} !\.(css|gif|ico|jpg|js|png|swf|txt|svg|woff|ttf|eot)&amp;
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . index.html [L]
-</code></pre>
-<p>具体的语法参考：</p>
-<blockquote>
-<p><a href="https://www.jianshu.com/p/9f9c0284b964">Apache Rewrite 初学记录</a></p>
-</blockquote>
-<br/>
-<h1 id="react部分">React部分</h1>
-<h2 id="1-配置二级目录">1. 配置二级目录</h2>
-<p>应用服务器里一般不只有一个应用，一般每个应用都会放在一个二级目录里，如htdocs/XXX，React里要做相应的配置</p>
-<ol>
-<li>在package.json里添加&quot;homepage&quot;:&quot;/XXX&quot; ，这个是指定资源的访问路径，即<code>%PUBLIC_URL%</code><br>
-然后在index.html的head里的最上方添加<code>&lt;base href=&quot;%PUBLIC_URL%/&quot;&gt;</code>，统一添加前缀。</li>
-<li>给Router添加basename属性，可以根据环境决定是否添加</li>
-</ol>
-<pre><code class="language-jsx">const isProd = process.env.NODE_ENV === 'production'
-&lt;Router basename={isProd?'/XXX':'/'}&gt;
-&lt;/Router&gt;
-</code></pre>
-<h2 id="2-发布">2. 发布</h2>
-<p>运行build命令，然后将build目录下的文件拷贝到htdocs/XXX下就可以了<br>
-<br/></p>
-<p>参考文章：</p>
-<blockquote>
-<p><a href="https://skryvets.com/blog/2018/09/20/an-elegant-solution-of-deploying-react-app-into-a-subdirectory/">An elegant solution of deploying React app into a subdirectory</a></p>
-</blockquote>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[SpringBoot解决跨域问题/跨域与拦截器冲突问题]]></title>
-        <id>https://gonlua.github.io/post/springboot-jie-jue-kua-yu-wen-ti-kua-yu-yu-lan-jie-qi-chong-tu-wen-ti/</id>
-        <link href="https://gonlua.github.io/post/springboot-jie-jue-kua-yu-wen-ti-kua-yu-yu-lan-jie-qi-chong-tu-wen-ti/">
-        </link>
-        <updated>2020-07-09T05:20:21.000Z</updated>
-        <content type="html"><![CDATA[<p>跨域问题可以从前端或者后端解决，这里是后端SpringBoot的解决方法：</p>
-<p>方法一：<br>
-在Spring配置里添加CorsMapping，允许跨域：</p>
-<pre><code class="language-java">@Configuration
-public class InterceptorConfig extends WebMvcConfigurationSupport {
-
-    @Override
-	protected void addCorsMappings(CorsRegistry registry) {
-            registry.addMapping(&quot;/**&quot;)
-            .allowedOrigins(&quot;*&quot;) //允许来源域名
-            .allowCredentials(true)
-            .allowedMethods(&quot;GET&quot;, &quot;POST&quot;, &quot;DELETE&quot;, &quot;PUT&quot;,&quot;PATCH&quot;)
-            .allowedHeaders(&quot;*&quot;);
-	}
-	
-}
-</code></pre>
-<br/>
-<p>但是这样添加的Mapping是在拦截器之后执行的，所以像登陆验证这样的拦截器不通过时，直接返回结果就还是会有跨域问题，所以要使用另一个方法，添加CorsFilter，因为Filter是在拦截器之前执行的，所以没有这个问题：</p>
-<p>方法二：</p>
-<pre><code class="language-Java">@Configuration
-public class CorsFilterConfig {
-
-    @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin(&quot;*&quot;);
-        config.setAllowCredentials(true);
-        config.addAllowedMethod(&quot;*&quot;);
-        config.addAllowedHeader(&quot;*&quot;);
-        UrlBasedCorsConfigurationSource configSource = new UrlBasedCorsConfigurationSource();
-        configSource.registerCorsConfiguration(&quot;/**&quot;, config);
-        return new CorsFilter(configSource);
-    }
-}
-</code></pre>
 ]]></content>
     </entry>
 </feed>

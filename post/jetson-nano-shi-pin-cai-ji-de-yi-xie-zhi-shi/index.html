@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" >
 
-<title>IE11 | gonlua&#39;s blog</title>
+<title>Jetson Nano视频采集的一些知识 | gonlua&#39;s blog</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
@@ -18,7 +18,11 @@
 
 
 
-    <meta name="description" content="ゴンルアのブログ">
+    <meta name="description" content="UVC和V4L2的关系
+
+UVC(USB Video Class)是一种usb视频设备驱动。用来支持usb视频设备，凡是usb接口的摄像头都能够支持
+V4L2 (VIdeo4Linux2)是Linux下的视频采集框架。用来统一接口，向应用层..." />
+    <meta name="keywords" content="" />
   </head>
   <body>
     <div id="app" class="main">
@@ -88,28 +92,52 @@
 
       <div class="main-container">
         <div class="content-container" data-aos="fade-up">
-          <h2 class="current-tag">标签: IE11</h2>
-          
-            <article class="post-item">
-              <div class="left">
-                <a href="https://gonlua.github.io/post/antd-select-zu-jian-zai-ie11-xia-shan-shuo-wen-ti-jie-jue/">
-                  <h2 class="post-title">antd Select组件在IE11下闪烁问题解决</h2>
-                </a>
-                <div class="post-date">
-                  2020-07-09
-                </div>
-                <div class="post-abstract">
-                  
-                </div>
-              </div>
-              
-            </article>
-          
+          <div class="post-detail">
+            <h2 class="post-title">Jetson Nano视频采集的一些知识</h2>
+            <div class="post-date">2020-09-24</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="uvc和v4l2的关系">UVC和V4L2的关系</h2>
+<ul>
+<li>UVC(USB Video Class)是一种usb视频设备驱动。用来支持usb视频设备，凡是usb接口的摄像头都能够支持</li>
+<li>V4L2 (VIdeo4Linux2)是Linux下的视频采集框架。用来统一接口，向应用层提供API.</li>
+<li>简单的讲V4L2就是用来管理UVC设备的并且能够提供视频相关的一些API。</li>
+</ul>
+<h3 id="查找是否有视频类借口信息">查找是否有视频类借口信息</h3>
+<p><code>lsusb -d VID：PID -v | grep &quot;14 Video&quot;</code><br>
+如果兼容UVC，则会输出类似信息<br>
+bFunctionClass 14 Video<br>
+bInterfaceClass 14 Video<br>
+如果没有以上信息，则是non-UVC设备。</p>
+<h3 id="查看usb视频设备信息的命令查看支持的图像格式">查看usb视频设备信息的命令(查看支持的图像格式)：</h3>
+<pre><code>sudo apt-get install v4l-utils
+v4l2-ctl --list-formats-ext -d /dev/video0
+</code></pre>
+<p>目前很多免驱的VGA2USB视频采集卡都是将利用了UVC，达到免驱的效果。</p>
+<p>从Jetson Nano的软件技术文档可以得知其支持UVC:<br>
+<img src="https://gonlua.github.io/post-images/1600925368069.png" alt="" loading="lazy"></p>
+<p>因为Jetson Nano可以直接读取采集卡图像/视频<br>
+打开设备：<br>
+<code>./video-viewer.py v4l2:///dev/video0</code><br>
+获取一帧图像并识别：<br>
+<code>./imagenet.py /dev/video0</code></p>
 
-          <div class="pagination-container">
-  
-  
-</div>
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/linux-shi-yong-sed-ming-ling-pi-liang-tian-jia-zhu-shi/">
+                  <h3 class="post-title">
+                    Linux使用sed命令批量添加注释
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
 
         </div>
       </div>
