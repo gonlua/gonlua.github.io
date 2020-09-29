@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://gonlua.github.io</id>
     <title>gonlua&apos;s blog</title>
-    <updated>2020-09-29T08:31:43.190Z</updated>
+    <updated>2020-09-29T09:30:18.253Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://gonlua.github.io"/>
     <link rel="self" href="https://gonlua.github.io/atom.xml"/>
@@ -10,6 +10,96 @@
     <logo>https://gonlua.github.io/images/avatar.png</logo>
     <icon>https://gonlua.github.io/favicon.ico</icon>
     <rights>All rights reserved 2020, gonlua&apos;s blog</rights>
+    <entry>
+        <title type="html"><![CDATA[SheetJS (JS-XLSX)的使用]]></title>
+        <id>https://gonlua.github.io/post/sheetjs-js-xlsxde-shi-yong/</id>
+        <link href="https://gonlua.github.io/post/sheetjs-js-xlsxde-shi-yong/">
+        </link>
+        <updated>2020-09-29T08:54:10.000Z</updated>
+        <content type="html"><![CDATA[<ol>
+<li>创建Workbook
+<ul>
+<li>从零创建</li>
+</ul>
+<pre><code class="language-JS">var wb = {SheetNames:['Sheet1'], Sheets:{}, Props:{}};
+</code></pre>
+<ul>
+<li>读取现有的spreadsheet (ajax方式)</li>
+</ul>
+<pre><code class="language-JS">var url = &quot;http://oss.sheetjs.com/test_files/formula_stress_test.xlsx&quot;;
+
+/* set up async GET request */
+var req = new XMLHttpRequest();
+req.open(&quot;GET&quot;, url, true);
+req.responseType = &quot;arraybuffer&quot;;
+
+req.onload = function(e) {
+var data = new Uint8Array(req.response);
+var workbook = XLSX.read(data, {type:&quot;array&quot;});
+
+/* DO SOMETHING WITH workbook HERE */
+}
+
+req.send();
+</code></pre>
+</li>
+</ol>
+<p> </p>
+<ol start="2">
+<li>获取/创建/修改Worksheet
+<ul>
+<li>从Workbook中获取</li>
+</ul>
+<pre><code class="language-JS">var ws = workbook.Sheets[workbook.SheetNames[0]]; //获取第一个Worksheet
+</code></pre>
+<ul>
+<li>利用二维数组创建</li>
+</ul>
+<pre><code class="language-JS">// 中间空的单元格要设为空值，后面的可以省略
+var ws = XLSX.utils.aoa_to_sheet([
+    [1,2,3,4,5,6,7],
+    [1,2,3,4,null,6,7],
+    [1,2,3,4,5]
+]);
+</code></pre>
+<ul>
+<li>二维数组添加到现有的Worksheet中</li>
+</ul>
+<pre><code class="language-JS">XLSX.utils.sheet_add_aoa(ws, array, {origin: 'A3'});  //指定坐标为A3
+</code></pre>
+</li>
+</ol>
+<p> </p>
+<ol start="3">
+<li>合并单元格
+<ul>
+<li>首先要说明一下在SheetJS里的单元格是表示方式<br>
+SheetJS里以<code>{c:C, r:R}</code>的对象表示一个单元格，c是Column，r是Row, C和R是列和行的坐标(从0开始算)，因此单元格B5，在SheetJS里表示为<code>{c:1, r:4}</code><br>
+SheetJS里以<code>{s:S, e:E}</code>的对象表示一个范围，s是Start, e是End, S和E是开始和结束的单元格，因此B5~C5这个范围表示为<code>{s:{c:1, r:4}, e:{c:2, r:4}}</code></li>
+<li>然后就可以进行单元格合并<br>
+在Worksheet里有个<code>!merges</code>属性，用来存放单元格的合并信息，是一个“范围”对象的数组<br>
+所以刚刚的B5~C5合并要写成<code>ws['!merges'] = [{s:{c:1, r:4}, e:{c:2, r:4}}]</code></li>
+</ul>
+</li>
+</ol>
+<p> </p>
+<ol start="4">
+<li>将Worksheet添加到Workbook<pre><code class="language-JS"> wb.Sheets['Sheet1'] = ws;
+</code></pre>
+</li>
+</ol>
+<p> </p>
+<ol start="5">
+<li>Workbook导出
+<ul>
+<li>方法会自动判断导出的格式(ods里面只能有一个Worksheet，不然会报错，不知道为什么)，浏览器环境会自动下载</li>
+</ul>
+<pre><code class="language-JS">XLSX.writeFile(wb, 'out.ods');
+</code></pre>
+</li>
+</ol>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Jetson Nano视频采集的一些知识]]></title>
         <id>https://gonlua.github.io/post/jetson-nano-shi-pin-cai-ji-de-yi-xie-zhi-shi/</id>
@@ -263,16 +353,6 @@ public void preDestroy() {
     }
 }
 </code></pre>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[React打包war]]></title>
-        <id>https://gonlua.github.io/post/react-da-bao-war/</id>
-        <link href="https://gonlua.github.io/post/react-da-bao-war/">
-        </link>
-        <updated>2020-07-10T00:09:54.000Z</updated>
-        <content type="html"><![CDATA[<p>参考文章：<br>
-<a href="https://www.megadix.it/blog/create-react-app-servlet/">Deploy React Applications in a Servlet Environment</a></p>
 ]]></content>
     </entry>
 </feed>

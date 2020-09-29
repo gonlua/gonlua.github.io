@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>SheetJS (JS-XLSX)的使用 | gonlua&#39;s blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1601371814147">
+<link rel="stylesheet" href="https://gonlua.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+创建Workbook
+
+从零创建
+
+var wb = {SheetNames:['Sheet1'], Sheets:{}, Props:{}};
+
+
+读取现有的spreadsheet (ajax方式)
+
+var url = &quot;h..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://gonlua.github.io">
+        <img src="https://gonlua.github.io/images/avatar.png?v=1601371814147" class="site-logo">
+        <h1 class="site-title">gonlua&#39;s blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ゴンルアのブログ
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">SheetJS (JS-XLSX)的使用</h2>
+            <div class="post-date">2020-09-29</div>
+            
+            <div class="post-content" v-pre>
+              <ol>
+<li>创建Workbook
+<ul>
+<li>从零创建</li>
+</ul>
+<pre><code class="language-JS">var wb = {SheetNames:['Sheet1'], Sheets:{}, Props:{}};
+</code></pre>
+<ul>
+<li>读取现有的spreadsheet (ajax方式)</li>
+</ul>
+<pre><code class="language-JS">var url = &quot;http://oss.sheetjs.com/test_files/formula_stress_test.xlsx&quot;;
+
+/* set up async GET request */
+var req = new XMLHttpRequest();
+req.open(&quot;GET&quot;, url, true);
+req.responseType = &quot;arraybuffer&quot;;
+
+req.onload = function(e) {
+var data = new Uint8Array(req.response);
+var workbook = XLSX.read(data, {type:&quot;array&quot;});
+
+/* DO SOMETHING WITH workbook HERE */
+}
+
+req.send();
+</code></pre>
+</li>
+</ol>
+<p> </p>
+<ol start="2">
+<li>获取/创建/修改Worksheet
+<ul>
+<li>从Workbook中获取</li>
+</ul>
+<pre><code class="language-JS">var ws = workbook.Sheets[workbook.SheetNames[0]]; //获取第一个Worksheet
+</code></pre>
+<ul>
+<li>利用二维数组创建</li>
+</ul>
+<pre><code class="language-JS">// 中间空的单元格要设为空值，后面的可以省略
+var ws = XLSX.utils.aoa_to_sheet([
+    [1,2,3,4,5,6,7],
+    [1,2,3,4,null,6,7],
+    [1,2,3,4,5]
+]);
+</code></pre>
+<ul>
+<li>二维数组添加到现有的Worksheet中</li>
+</ul>
+<pre><code class="language-JS">XLSX.utils.sheet_add_aoa(ws, array, {origin: 'A3'});  //指定坐标为A3
+</code></pre>
+</li>
+</ol>
+<p> </p>
+<ol start="3">
+<li>合并单元格
+<ul>
+<li>首先要说明一下在SheetJS里的单元格是表示方式<br>
+SheetJS里以<code>{c:C, r:R}</code>的对象表示一个单元格，c是Column，r是Row, C和R是列和行的坐标(从0开始算)，因此单元格B5，在SheetJS里表示为<code>{c:1, r:4}</code><br>
+SheetJS里以<code>{s:S, e:E}</code>的对象表示一个范围，s是Start, e是End, S和E是开始和结束的单元格，因此B5~C5这个范围表示为<code>{s:{c:1, r:4}, e:{c:2, r:4}}</code></li>
+<li>然后就可以进行单元格合并<br>
+在Worksheet里有个<code>!merges</code>属性，用来存放单元格的合并信息，是一个“范围”对象的数组<br>
+所以刚刚的B5~C5合并要写成<code>ws['!merges'] = [{s:{c:1, r:4}, e:{c:2, r:4}}]</code></li>
+</ul>
+</li>
+</ol>
+<p> </p>
+<ol start="4">
+<li>将Worksheet添加到Workbook<pre><code class="language-JS"> wb.Sheets['Sheet1'] = ws;
+</code></pre>
+</li>
+</ol>
+<p> </p>
+<ol start="5">
+<li>Workbook导出
+<ul>
+<li>方法会自动判断导出的格式(ods里面只能有一个Worksheet，不然会报错，不知道为什么)，浏览器环境会自动下载</li>
+</ul>
+<pre><code class="language-JS">XLSX.writeFile(wb, 'out.ods');
+</code></pre>
+</li>
+</ol>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/jetson-nano-shi-pin-cai-ji-de-yi-xie-zhi-shi/">
+                  <h3 class="post-title">
+                    Jetson Nano视频采集的一些知识
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
