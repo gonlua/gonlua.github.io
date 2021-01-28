@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>错误 Property &#39;$axios&#39; does not exist on type &#39;CombinedVueInstance | gonlua&#39;s blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1611819678955">
+<link rel="stylesheet" href="https://gonlua.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="如果用到了eslint，想要将$axios注入到Vue
+除了在main.ts加入
+Vue.prototype.$axios = axios
+
+之外
+ p
+还要在shims-tsx.d.ts里添加
+import {AxiosInstance}..." />
+    <meta name="keywords" content="Vue" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://gonlua.github.io">
+        <img src="https://gonlua.github.io/images/avatar.png?v=1611819678955" class="site-logo">
+        <h1 class="site-title">gonlua&#39;s blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ゴンルアのブログ
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">错误 Property &#39;$axios&#39; does not exist on type &#39;CombinedVueInstance</h2>
+            <div class="post-date">2020-10-21</div>
+            
+            <div class="post-content" v-pre>
+              <p>如果用到了eslint，想要将$axios注入到Vue<br>
+除了在main.ts加入</p>
+<pre><code class="language-js">Vue.prototype.$axios = axios
+</code></pre>
+<p>之外<br>
+ p<br>
+还要在shims-tsx.d.ts里添加</p>
+<pre><code class="language-js">import {AxiosInstance} from 'axios'
+
+declare module 'vue/types/vue' {
+  interface Vue {
+      $axios: AxiosInstance;
+  }
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://gonlua.github.io/tag/BvqQ9VGVM/" class="tag">
+                    Vue
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/jetson-nano-an-zhuang-easyocr/">
+                  <h3 class="post-title">
+                    Jetson Nano安装easyocr
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Tomcat应用取消部署时内存泄露问题 | gonlua&#39;s blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1611819678955">
+<link rel="stylesheet" href="https://gonlua.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="最近要升级到tomcat9，发现app undeploy时多了两个WARNING，而且通过在tomcat的管理页面的Find leaks功能检查时，发现应用还在那里。
+WARNING [http-nio-8080-exec-131] org..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://gonlua.github.io">
+        <img src="https://gonlua.github.io/images/avatar.png?v=1611819678955" class="site-logo">
+        <h1 class="site-title">gonlua&#39;s blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ゴンルアのブログ
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Tomcat应用取消部署时内存泄露问题</h2>
+            <div class="post-date">2020-12-18</div>
+            
+            <div class="post-content" v-pre>
+              <p>最近要升级到tomcat9，发现app undeploy时多了两个WARNING，而且通过在tomcat的管理页面的Find leaks功能检查时，发现应用还在那里。</p>
+<pre><code class="language-shell">WARNING [http-nio-8080-exec-131] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesJdbc The web application [XXX] registered the JDBC driver [com.mysql.jdbc.Driver] but failed to unregister it when the web application was stopped. To prevent a memory leak, the JDBC Driver has been forcibly unregistered.
+WARNING [http-nio-8080-exec-131] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesThreads The web application [XXX] appears to have started a thread named [MySQL Statement Cancellation Timer] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.lang.Object.wait(Native Method)
+ java.lang.Object.wait(Object.java:502)
+ java.util.TimerThread.mainLoop(Timer.java:526)
+ java.util.TimerThread.run(Timer.java:505)
+
+</code></pre>
+<p>第一个是数据库驱动没有unregister, tomcat自动帮我们unregister了，如果想自己unregister，可以在web.xml里添加一个listener:</p>
+<pre><code class="language-xml">&lt;listener&gt; 
+	&lt;listener-class&gt;cn.gonlua.ExitCleaner&lt;/listener-class&gt; 
+&lt;/listener&gt;
+</code></pre>
+<p>在contextDestoryed里手动卸载驱动</p>
+<pre><code class="language-Java">public class ExitCleaner implements ServletContextListener {
+	
+	@Override
+	public void contextDestroyed(ServletContextEvent arg0) {
+		final Enumeration&lt;Driver&gt; drivers = DriverManager.getDrivers();
+        Driver driver;
+        while (drivers.hasMoreElements()) {
+            driver = drivers.nextElement();
+            try {
+                DriverManager.deregisterDriver(driver);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+	}
+    ......
+}
+</code></pre>
+<p> <br>
+第一个问题解决了，第二个问题中的MySQL Statement Cancellation Timer是什么呢？经过查阅，简单来说是MySQL用来检测超时的查询的，这个Timer在undeploy不会关闭，通过<code>jstack -l &lt;PID&gt;</code>命令查看线程信息也可以证实线程一直没关闭。就算setQueryTimeout(0); 也还是会创建Timer，奇怪了。网上查不到合适的信息，于是我查看了mysql-connector-java-5.1.16源码，发现Timer是在静态代码块里创建的，而且根本没有关闭Timer的地方，怪不得了。</p>
+<pre><code class="language-Java">private static Timer cancelTimer;
+......
+static {
+		......
+		
+		boolean createdNamedTimer = false;
+		
+		// Use reflection magic to try this on JDK's 1.5 and newer, fallback to non-named
+		// timer on older VMs.
+		try {
+			Constructor ctr = Timer.class.getConstructor(new Class[] {String.class, Boolean.TYPE});
+			
+			cancelTimer = (Timer)ctr.newInstance(new Object[] { &quot;MySQL Statement Cancellation Timer&quot;, Boolean.TRUE});
+			createdNamedTimer = true;
+		} catch (Throwable t) {
+			createdNamedTimer = false;
+		}
+		
+		if (!createdNamedTimer) {
+			cancelTimer = new Timer(true);
+		}
+        ......
+}
+</code></pre>
+<p>于是我又查看了mysql-connector-java-5.1.49的源码，Timer是实例创建的，并且在关闭连接时有关闭Timer:</p>
+<pre><code class="language-Java">private transient Timer cancelTimer;
+
+......
+
+public Timer getCancelTimer() {
+    synchronized (getConnectionMutex()) {
+        if (this.cancelTimer == null) {
+            this.cancelTimer = new Timer(&quot;MySQL Statement Cancellation Timer&quot;, true);
+        }
+        return this.cancelTimer;
+    }
+}
+......
+
+public void realClose(boolean calledExplicitly, boolean issueRollback, boolean skipLocalTeardown, Throwable reason) throws SQLException {
+    ......
+    try {
+        ......
+    } finally {
+        ......
+        synchronized (getConnectionMutex()) {
+            if (this.cancelTimer != null) {
+                this.cancelTimer.cancel();
+            }
+        }
+
+        this.isClosed = true;
+    }
+......
+}
+</code></pre>
+<p> <br>
+更新mysql驱动后，undeploy，Find leaks，发现还是没有完全undeploy(Timer线程还在)，但是再次点击Fink leaks后，就完全undeploy(Timer线程停止了)。<br>
+应该是因为Find leaks会触发Full GC，所以是被回收了。<br>
+如果setQueryTimeout(0); 也不会创建Timer了。但是undeploy后Find leaks还是有残留, Full GC后就没有了。<br>
+通过对比Full GC前后的dump，发现undeploy后，webappClassLoader不会马上回收，Full GC后才会回收，应该是tomcat的机制。</p>
+<p> <br>
+第二个问题也算是解决了，但是tomcat log里又有一个新的WARNING：</p>
+<pre><code class="language-shell">INFO [mysql-cj-abandoned-connection-cleanup] org.apache.catalina.loader.WebappClassLoaderBase.checkSt
+ateForResourceLoading Illegal access: this web application instance has been stopped already. Could not load []. The following
+ stack trace is thrown for debugging purposes as well as to attempt to terminate the thread which caused the illegal access.
+        java.lang.IllegalStateException: Illegal access: this web application instance has been stopped already. Could not loa
+d []. The following stack trace is thrown for debugging purposes as well as to attempt to terminate the thread which caused th
+e illegal access.
+    at org.apache.catalina.loader.WebappClassLoaderBase.checkStateForResourceLoading(WebappClassLoaderBase.java:13
+85)
+    at org.apache.catalina.loader.WebappClassLoaderBase.getResource(WebappClassLoaderBase.java:1038)
+    at com.mysql.jdbc.AbandonedConnectionCleanupThread.checkThreadContextClassLoader(AbandonedConnectionCleanupThr
+ead.java:112)
+    at com.mysql.jdbc.AbandonedConnectionCleanupThread.run(AbandonedConnectionCleanupThread.java:79)
+    at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+    at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+    at java.lang.Thread.run(Thread.java:748)
+
+</code></pre>
+<p>也是在contextDestroyed里手动关闭就好了：</p>
+<pre><code class="language-shell">AbandonedConnectionCleanupThread.checkedShutdown();
+</code></pre>
+<p> <br>
+关于tomcat自动加载驱动，tomcat会在启动时扫描符合SPI的驱动来加载，新deploy的应用首次getConnection时也会自动加载驱动，但是会报错<code>java.sql.SQLException: No suitable driver found for jdbc:mysql</code>，然后重试，所以最好还是用class.forName自己先行加载。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/ji-yi-ci-jdbc-lian-jie-ji-man-de-wen-ti/">
+                  <h3 class="post-title">
+                    记一次JDBC连接极慢的问题
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>

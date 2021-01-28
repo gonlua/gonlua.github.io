@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>记一次JDBC连接极慢的问题 | gonlua&#39;s blog</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://gonlua.github.io/favicon.ico?v=1611819678955">
+<link rel="stylesheet" href="https://gonlua.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="背景
+测试服务器上有两个tomcat，其中的一个tomat上的应用使用jdbc连接时都超慢。
+开始排除原因：
+
+数据库问题？连不同数据库也慢，排除。
+服务器或网络问题？另外一个tomcat没问题，排除。
+ 
+看来是这个tomcat里的问题，..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://gonlua.github.io">
+        <img src="https://gonlua.github.io/images/avatar.png?v=1611819678955" class="site-logo">
+        <h1 class="site-title">gonlua&#39;s blog</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ゴンルアのブログ
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://gonlua.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">记一次JDBC连接极慢的问题</h2>
+            <div class="post-date">2020-12-16</div>
+            
+            <div class="post-content" v-pre>
+              <h3 id="背景">背景</h3>
+<p>测试服务器上有两个tomcat，其中的一个tomat上的应用使用jdbc连接时都超慢。<br>
+开始排除原因：</p>
+<ol>
+<li>数据库问题？连不同数据库也慢，排除。</li>
+<li>服务器或网络问题？另外一个tomcat没问题，排除。<br>
+ <br>
+看来是这个tomcat里的问题，打印log，发现时间都花在了这一句上：</li>
+</ol>
+<pre><code class="language-Java">conn = java.sql.DriverManager.getConnection(url, userName, password);
+</code></pre>
+<p>查看源码，发现里面有打印日志，不过默认是不打印的，要传个Writer给它：</p>
+<pre><code class="language-Java">java.sql.DriverManager.setLogWriter(new PrintWriter(System.out));
+</code></pre>
+<p> <br>
+好家伙，不打不知道，一打吓一跳，日志刷的飞快，全是</p>
+<pre><code>    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+    skipping: java.sql.DriverInfo
+</code></pre>
+<p>查看DriverManager源码，关键代码如下：</p>
+<pre><code class="language-java">// Walk through the loaded registeredDrivers attempting to locate someone
+// who understands the given URL.
+for (DriverInfo aDriver : registeredDrivers) {
+    // If the caller does not have permission to load the driver then
+    // skip it.
+    if(isDriverAllowed(aDriver.driver, callerClass)) {
+        try {
+            if(aDriver.driver.acceptsURL(url)) {
+                // Success!
+                println(&quot;getDriver returning &quot; + aDriver.driver.getClass().getName());
+                return (aDriver.driver);
+            }
+
+        } catch(SQLException sqe) {
+            // Drop through and try the next driver.
+        }
+    } else {
+        println(&quot;    skipping: &quot; + aDriver.driver.getClass().getName());
+    }
+}
+</code></pre>
+<p>原来是getConnection时，会查找registeredDrivers这个保存已注册的驱动的列表，没有权限的（不是这个ClassLoader）的就跳过。所以为什么registeredDrivers里会有这个多驱动？</p>
+<p> <br>
+dump tomat堆栈信息，用MemoryAnalyzer分析，发现registeredDrivers里有惊人的32万+items.<br>
+<img src="https://gonlua.github.io/post-images/1608108722226.png" alt="" loading="lazy"></p>
+<p>结合DriverManager的log，发现有另一个应用在一直注册DriverProxy类型的驱动：</p>
+<pre><code>registerDriver: org.apache.commons.dbutils.DbUtils$DriverProxy@1143ad7f
+DriverManager.getConnection(&quot;jdbc:oracle:thin:@10.10.XXX.XXX:XXX:XXX&quot;)
+registerDriver: org.apache.commons.dbutils.DbUtils$DriverProxy@338314b
+DriverManager.getConnection(&quot;jdbc:oracle:thin:@10.10.XXX.XXX:XXX:XXX&quot;)
+registerDriver: org.apache.commons.dbutils.DbUtils$DriverProxy@5fc1fac0
+DriverManager.getConnection(&quot;jdbc:oracle:thin:@10.10.XXX.XXX:XXX:XXX&quot;)
+registerDriver: org.apache.commons.dbutils.DbUtils$DriverProxy@39ef9f3b
+DriverManager.getConnection(&quot;jdbc:oracle:thin:@10.10.XXX.XXX:XXX:XXX&quot;)
+</code></pre>
+<p>虽然注册驱动时会判断是否存在，但只是判断是不是同一个对象，而这里每次都是一个新实例。<br>
+那为什么另一个应用不断注册驱动，会影响到这个应用？<br>
+因为tomcat上的所有应用的数据库驱动是由tomcat统一管理的，所有应用访问的都是同一个registeredDrivers列表。</p>
+<p> <br>
+根据以上线索终于找到了另一个应用中的问题代码：</p>
+<pre><code class="language-Java">DbUtils.loadDriver(JDBC_DRIVER);
+conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+</code></pre>
+<p>进一步查看DbUtils.loadDriver里面，可以看到每次调用都是创建了一个新的驱动实例并注册。</p>
+<pre><code class="language-Java">public static boolean loadDriver(ClassLoader classLoader, String driverClassName) {
+    try {
+        Class loadedClass = classLoader.loadClass(driverClassName);
+
+        if (!(Driver.class.isAssignableFrom(loadedClass))) {
+            return false;
+        }
+
+        Class driverClass = loadedClass;
+        Constructor driverConstructor = driverClass.getConstructor(new Class[0]);
+
+        boolean isConstructorAccessible = driverConstructor.isAccessible();
+        if (!(isConstructorAccessible)) {
+            driverConstructor.setAccessible(true);
+        }
+        try {
+            Driver driver = (Driver) driverConstructor.newInstance(new Object[0]);
+            DriverManager.registerDriver(new DriverProxy(driver));
+        } finally {
+            driverConstructor.setAccessible(isConstructorAccessible);
+        }
+
+        return true;
+    } catch (RuntimeException e) {
+        return false;
+    } catch (Exception e) {
+    }
+    return false;
+}
+</code></pre>
+<p> <br>
+问题点是找到了，但是tomcat上有几十个应用，为什么其它的不会重复注册？<br>
+查看其它应用的代码，不是用<code>DbUtils.loadDriver</code>, 而是<code>Class.forName</code>, 驱动内部的注册代码是在static{}里的，可以保证只注册一次：</p>
+<pre><code class="language-Java">public class Driver extends NonRegisteringDriver implements java.sql.Driver {
+	static {
+		try {
+			DriverManager.registerDriver(new Driver());
+		} catch (SQLException E) {
+			throw new RuntimeException(&quot;Can't register driver!&quot;);
+		}
+	}
+}
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://gonlua.github.io/post/mybatis-shi-yong/">
+                  <h3 class="post-title">
+                    Mybatis使用
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+
+
+
+
+  </body>
+</html>
